@@ -9,15 +9,15 @@ import (
     "github.com/dsoprea/go-gpxreader/gpxreader"
 )
 
-type gpxVisitor struct {}
+type gpxVisitor struct {
+    StartSegment bool
+}
 
 func newGpxVisitor() *gpxVisitor {
     return &gpxVisitor {}
 }
 
 func (gv *gpxVisitor) GpxOpen(gpx *gpxreader.Gpx) error {
-    fmt.Printf("GPX: %s\n", gpx)
-
     return nil
 }
 
@@ -26,8 +26,6 @@ func (gv *gpxVisitor) GpxClose(gpx *gpxreader.Gpx) error {
 }
 
 func (gv *gpxVisitor) TrackOpen(track *gpxreader.Track) error {
-    fmt.Printf("Track: %s\n", track)
-
     return nil
 }
 
@@ -36,12 +34,13 @@ func (gv *gpxVisitor) TrackClose(track *gpxreader.Track) error {
 }
 
 func (gv *gpxVisitor) TrackSegmentOpen(trackSegment *gpxreader.TrackSegment) error {
-    fmt.Printf("Track segment: %s\n", trackSegment)
-
+    fmt.Printf("{ \"type\": \"LineString\", \"coordinates\": [ ")
+    gv.StartSegment = true
     return nil
 }
 
 func (gv *gpxVisitor) TrackSegmentClose(trackSegment *gpxreader.TrackSegment) error {
+    fmt.Printf(" ] }\n")
     return nil
 }
 
@@ -50,8 +49,12 @@ func (gv *gpxVisitor) TrackPointOpen(trackPoint *gpxreader.TrackPoint) error {
 }
 
 func (gv *gpxVisitor) TrackPointClose(trackPoint *gpxreader.TrackPoint) error {
-    fmt.Printf("Point: %s\n", trackPoint)
-
+    if gv.StartSegment {
+        gv.StartSegment = false
+    } else {
+        fmt.Printf(", ")
+    }
+    fmt.Printf("[%v, %v]", trackPoint.LongitudeDecimal, trackPoint.LatitudeDecimal)
     return nil
 }
 
