@@ -34,13 +34,13 @@ func (gv *gpxVisitor) TrackClose(track *gpxreader.Track) error {
 }
 
 func (gv *gpxVisitor) TrackSegmentOpen(trackSegment *gpxreader.TrackSegment) error {
-    fmt.Printf("{ \"type\": \"LineString\", \"coordinates\": [ ")
+    fmt.Printf("{ \"type\": \"Feature\", \"geometry\": { \"type\": \"LineString\", \"coordinates\": [ ")
     gv.StartSegment = true
     return nil
 }
 
 func (gv *gpxVisitor) TrackSegmentClose(trackSegment *gpxreader.TrackSegment) error {
-    fmt.Printf(" ] }\n")
+    fmt.Printf(" ] } }\n")
     return nil
 }
 
